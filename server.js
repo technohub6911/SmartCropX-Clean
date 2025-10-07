@@ -40,11 +40,8 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ?
     process.env.ALLOWED_ORIGINS.split(',') : 
     ['http://localhost:3000'];
 
-// Security middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false // Completely disable CSP for now
-}));
+// Security middleware - CORRECT SYNTAX
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
 
 // Enhanced CORS configuration
