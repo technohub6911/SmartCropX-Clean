@@ -39,12 +39,11 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? 
     process.env.ALLOWED_ORIGINS.split(',') : 
     ['http://localhost:3000'];
-
 // Security middleware - CORRECT SYNTAX
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
 
-// Enhanced CORS configuration
+// Enhanced CORS configuration - FIXED
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
