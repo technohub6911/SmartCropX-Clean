@@ -5,8 +5,8 @@ console.log('🔧 Debug: script.js loaded');
 function showSignup() {
     console.log('📝 Showing signup form');
     // Add code to show signup form and hide login form
-    const loginForm = document.querySelector('.login-form');
-    const signupForm = document.querySelector('.signup-form');
+    const loginForm = document.querySelector('.login-form, .login-container, [class*="login"]');
+    const signupForm = document.querySelector('.signup-form, .signup-container, [class*="signup"]');
     
     if (loginForm) loginForm.style.display = 'none';
     if (signupForm) signupForm.style.display = 'block';
@@ -17,8 +17,8 @@ function showSignup() {
 function showLogin() {
     console.log('🔐 Showing login form');
     // Add code to show login form and hide signup form
-    const loginForm = document.querySelector('.login-form');
-    const signupForm = document.querySelector('.signup-form');
+    const loginForm = document.querySelector('.login-form, .login-container, [class*="login"]');
+    const signupForm = document.querySelector('.signup-form, .signup-container, [class*="signup"]');
     
     if (signupForm) signupForm.style.display = 'none';
     if (loginForm) loginForm.style.display = 'block';
@@ -50,9 +50,14 @@ function selectUserType(element, userType) {
 function login() {
     console.log('🔐 Login function called');
     
-    // Get username and password from form
-    const username = document.getElementById('username')?.value;
-    const password = document.getElementById('password')?.value;
+    // Get username and password from form - try multiple selectors
+    const username = document.getElementById('username')?.value || 
+                    document.querySelector('input[placeholder*="username" i]')?.value ||
+                    document.querySelector('input[type="text"]')?.value;
+    
+    const password = document.getElementById('password')?.value || 
+                    document.querySelector('input[placeholder*="password" i]')?.value ||
+                    document.querySelector('input[type="password"]')?.value;
     
     console.log('🔐 Login attempt:', { username, password });
     
@@ -62,10 +67,10 @@ function login() {
     }
     
     // Show loading state
-    const loginBtn = document.querySelector('.auth-btn [onclick*="login"]');
+    const loginBtn = document.querySelector('.auth-btn, button[onclick*="login"]');
     if (loginBtn) {
-        const loading = loginBtn.querySelector('.btn-loading');
-        const text = loginBtn.querySelector('.btn-text');
+        const loading = loginBtn.querySelector('.btn-loading, .loading');
+        const text = loginBtn.querySelector('.btn-text, .btn-text');
         if (loading) loading.classList.remove('hidden');
         if (text) text.textContent = 'Signing in...';
     }
@@ -77,18 +82,45 @@ function login() {
 function signup() {
     console.log('📝 Signup function called');
     
-    // Get signup form data
-    const username = document.getElementById('signupUsername')?.value;
-    const password = document.getElementById('signupPassword')?.value;
-    const fullName = document.getElementById('fullName')?.value;
-    const email = document.getElementById('email')?.value;
+    // Debug: Show all form fields
+    const allInputs = document.querySelectorAll('input');
+    console.log('📝 All form inputs found:', allInputs.length);
+    
+    allInputs.forEach(input => {
+        console.log(`📝 Input - ID: ${input.id}, Placeholder: ${input.placeholder}, Value: ${input.value}`);
+    });
+    
+    // Get signup form data - try multiple selectors
+    const username = document.getElementById('signupUsername')?.value || 
+                    document.getElementById('username')?.value ||
+                    document.querySelector('input[placeholder*="username" i]')?.value ||
+                    document.querySelector('input[type="text"]')?.value;
+    
+    const password = document.getElementById('signupPassword')?.value ||
+                    document.getElementById('password')?.value ||
+                    document.querySelector('input[placeholder*="password" i]')?.value ||
+                    document.querySelector('input[type="password"]')?.value;
+    
+    const fullName = document.getElementById('fullName')?.value ||
+                    document.querySelector('input[placeholder*="full name" i]')?.value ||
+                    document.querySelector('input[placeholder*="name" i]')?.value;
+    
+    const email = document.getElementById('email')?.value ||
+                  document.querySelector('input[type="email"]')?.value;
+    
     const age = document.getElementById('age')?.value;
     const region = document.getElementById('region')?.value;
     
-    console.log('📝 Signup attempt:', { username, password, fullName, email, age, region });
+    console.log('📝 Signup data extracted:', { username, password, fullName, email, age, region });
     
-    if (!username || !password || !fullName) {
-        alert('Please fill in all required fields');
+    // Validation
+    const missingFields = [];
+    if (!username) missingFields.push('Username');
+    if (!password) missingFields.push('Password');
+    if (!fullName) missingFields.push('Full Name');
+    
+    if (missingFields.length > 0) {
+        alert('Please fill in: ' + missingFields.join(', '));
         return;
     }
     
@@ -98,9 +130,9 @@ function signup() {
     }
     
     // Show loading state
-    const signupBtn = document.querySelector('.auth-btn [onclick*="signup"]');
+    const signupBtn = document.querySelector('.auth-btn, button[onclick*="signup"]');
     if (signupBtn) {
-        const loading = signupBtn.querySelector('.btn-loading');
+        const loading = signupBtn.querySelector('.btn-loading, .loading');
         const text = signupBtn.querySelector('.btn-text');
         if (loading) loading.classList.remove('hidden');
         if (text) text.textContent = 'Creating Account...';
@@ -117,6 +149,7 @@ function signup() {
         userType: window.selectedUserType || 'buyer'
     };
     
+    console.log('📝 Sending registration data:', userData);
     registerUser(userData);
 }
 
@@ -139,7 +172,6 @@ function replaceInlineHandlers() {
         if (button.getAttribute('onclick') === "login()") {
             button.removeAttribute('onclick');
             button.addEventListener('click', login);
-            button.style.border = '3px solid blue';
             console.log('🔧 Replaced login button onclick');
         }
     });
@@ -150,7 +182,6 @@ function replaceInlineHandlers() {
         if (button.getAttribute('onclick') === "signup()") {
             button.removeAttribute('onclick');
             button.addEventListener('click', signup);
-            button.style.border = '3px solid orange';
             console.log('🔧 Replaced signup button onclick');
         }
     });
@@ -162,13 +193,11 @@ function replaceInlineHandlers() {
     showSignupButtons.forEach(button => {
         button.removeAttribute('onclick');
         button.addEventListener('click', showSignup);
-        button.style.border = '3px solid purple';
     });
     
     showLoginButtons.forEach(button => {
         button.removeAttribute('onclick');
         button.addEventListener('click', showLogin);
-        button.style.border = '3px solid teal';
     });
     
     // User type selection
@@ -182,26 +211,14 @@ function replaceInlineHandlers() {
             button.addEventListener('click', function() {
                 selectUserType(this, userType);
             });
-            button.style.border = '3px solid pink';
-        }
-    });
-    
-    // Generic button debugging
-    const allButtons = document.querySelectorAll('button, [onclick], a.btn, input[type="submit"], .btn, [role="button"]');
-    console.log('🔧 Debug: Found buttons:', allButtons.length);
-    
-    allButtons.forEach((button, index) => {
-        // Only add debug borders to buttons without specific handlers
-        if (!button.hasAttribute('onclick') && !button.classList.contains('auth-btn')) {
-            button.style.border = '3px solid green';
         }
     });
 }
 
 function initializeForms() {
     // Set initial form states
-    const loginForm = document.querySelector('.login-form');
-    const signupForm = document.querySelector('.signup-form');
+    const loginForm = document.querySelector('.login-form, .login-container, [class*="login"]');
+    const signupForm = document.querySelector('.signup-form, .signup-container, [class*="signup"]');
     
     if (loginForm && signupForm) {
         loginForm.style.display = 'block';
@@ -243,8 +260,8 @@ async function loginUser(username, password) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             alert('✅ Login successful! Welcome ' + data.user.fullName);
-            // Redirect or update UI here
-            window.location.href = '/dashboard.html'; // Change to your actual dashboard page
+            // Redirect to refresh the page and show logged-in state
+            window.location.href = '/';
             return data;
         } else {
             alert('❌ Login failed: ' + data.error);
@@ -279,8 +296,8 @@ async function registerUser(userData) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             alert('✅ Registration successful! Welcome ' + data.user.fullName);
-            // Redirect or update UI here
-            window.location.href = '/dashboard.html'; // Change to your actual dashboard page
+            // Redirect to refresh the page
+            window.location.href = '/';
             return data;
         } else {
             alert('❌ Registration failed: ' + data.error);
@@ -295,15 +312,19 @@ async function registerUser(userData) {
 }
 
 function resetButtonState(type) {
-    const button = document.querySelector(`[onclick="${type}()"]`);
-    if (button) {
-        const loading = button.querySelector('.btn-loading');
+    const buttons = document.querySelectorAll('.auth-btn, button');
+    buttons.forEach(button => {
+        const loading = button.querySelector('.btn-loading, .loading');
         const text = button.querySelector('.btn-text');
         if (loading) loading.classList.add('hidden');
         if (text) {
-            text.textContent = type === 'login' ? 'Sign In' : 'Create Account';
+            if (type === 'login') {
+                text.textContent = 'Sign In';
+            } else if (type === 'signup') {
+                text.textContent = 'Create Account';
+            }
         }
-    }
+    });
 }
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -328,22 +349,24 @@ function logout() {
     window.location.href = '/';
 }
 
-// Initialize auth check on page load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        if (checkAuth()) {
-            // User is logged in, redirect to dashboard
-            // window.location.href = '/dashboard.html';
-        }
-    });
-} else {
-    if (checkAuth()) {
-        // User is logged in, redirect to dashboard
-        // window.location.href = '/dashboard.html';
+// Update UI based on auth state
+function updateUIBasedOnAuth() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.id) {
+        // User is logged in - hide auth forms, show user info
+        const authForms = document.querySelector('.login-form, .signup-form, .login-container, .signup-container');
+        if (authForms) authForms.style.display = 'none';
+        
+        // Show welcome message
+        console.log('✅ User is logged in as:', user.fullName);
     }
 }
 
-// Keep your existing functions below...
-// [Your existing API functions for products, AI detection, etc.]
+// Initialize auth check on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (checkAuth()) {
+        updateUIBasedOnAuth();
+    }
+});
 
 console.log('✅ All functions loaded successfully');
