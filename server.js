@@ -43,15 +43,7 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ?
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-      scriptSrcAttr: ["'self'", "'unsafe-inline'"], // ADD THIS LINE
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-    },
-  }
+  contentSecurityPolicy: false // Completely disable CSP for now
 }));
 app.use(compression());
 
