@@ -48,6 +48,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
       scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+      scriptSrcAttr: ["'self'", "'unsafe-inline'"], // ADD THIS LINE
       imgSrc: ["'self'", "data:", "https:", "blob:"],
     },
   }
